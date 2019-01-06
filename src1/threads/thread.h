@@ -4,7 +4,6 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
-#include "threads/synch.h"
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -24,18 +23,6 @@ typedef int tid_t;
 #define PRI_MIN 0                       /* Lowest priority. */
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
-
-/* struct to store information of child process */
-struct child_process {
-	int pid;
-	int load;
-	int status;
-	bool wait;
-	bool exit;
-	struct semaphore load_sema;
-	struct semaphore exit_sema;
-	struct list_elem elem;
-};
 
 /* A kernel thread or user process.
 
@@ -113,23 +100,6 @@ struct thread
 
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
-
-    /* locks current thread holding */
-    struct list lock_list;
-
-    /* file system syscall */
-    struct list file_list;
-    int fd;
-
-    /* wait and exec syscall */
-    struct list child_list;
-    tid_t parent;
-
-    /* the struct of child process */
-    struct child_process* cp;
-
-    /* used to deny writes to executables */
-    struct file* executable;
   };
 
 /* If false (default), use round-robin scheduler.
@@ -167,9 +137,5 @@ int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
-
-/* added for projects 2 */
-void is_alive_func(struct thread *t, void *aux);
-void reset_flag(void);
 
 #endif /* threads/thread.h */
